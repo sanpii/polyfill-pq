@@ -1,0 +1,3 @@
+[submodule "ext-pq"]
+	path = ext-pq
+	url = https://github.com/m6w6/ext-pq.git

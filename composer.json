@@ -1,0 +1,14 @@
+{
+    "name": "sanpi/polyfill-pq",
+    "type": "library",
+    "license": "MIT",
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
+    "autoload": {
+        "psr-4": {"pq\\": "src/"}
+    },
+    "config": {
+        "bin-dir": "bin/"
+    }
+}

@@ -33,6 +33,25 @@ class Result implements \Iterator, \Countable
         }
     }
 
+    public function fetchRow($fetchType = null)
+    {
+        if ($fetchType === null) {
+            $fetchType = $this->fetchType;
+        }
+
+        switch($fetchType) {
+            case self::FETCH_ARRAY:
+                return pg_fetch_array($this->results, $this->resultsIndex);
+            break;
+            case self::FETCH_ASSOC:
+                return pg_fetch_assoc($this->results, $this->resultsIndex);
+            break;
+            case self::FETCH_OBJECT:
+                return pg_fetch_object($this->results, $this->resultsIndex);
+            break;
+        }
+    }
+
     public function __get($name)
     {
         switch($name) {
@@ -55,17 +74,7 @@ class Result implements \Iterator, \Countable
 
     public function current()
     {
-        switch($this->fetchType) {
-            case self::FETCH_ARRAY:
-                return pg_fetch_array($this->results, $this->resultsIndex);
-            break;
-            case self::FETCH_ASSOC:
-                return pg_fetch_assoc($this->results, $this->resultsIndex);
-            break;
-            case self::FETCH_OBJECT:
-                return pg_fetch_object($this->results, $this->resultsIndex);
-            break;
-        }
+        return $this->fetchRow($this->fetchType);
     }
 
     public function key()

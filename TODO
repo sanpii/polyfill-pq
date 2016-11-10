@@ -29,7 +29,7 @@
 * [ ] flush001.phpt
 * [ ] gh-issue015_listeners.phpt
 * [ ] gh-issue015_statements.phpt
-* [ ] info001.phpt
+* [x] info001.phpt
 * [ ] info002.phpt
 * [ ] lob001.phpt
 * [ ] lob002.phpt

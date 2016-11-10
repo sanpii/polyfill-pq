@@ -5,6 +5,12 @@ namespace pq;
 class Connection
 {
     public $socket;
+    public $db;
+    public $user;
+    public $pass;
+    public $host;
+    public $port;
+    public $options;
 
     public function __construct($dsn, $flags = 0)
     {

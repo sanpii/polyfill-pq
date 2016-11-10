@@ -30,10 +30,10 @@ class Statement
                 $index++;
                 $this->query = str_replace("\$$index", "\$$index::$type", $this->query);
             }
-            pg_prepare($this->connection->socket, $this->name, $this->query);
+            pg_prepare($this->connection->handle, $this->name, $this->query);
         }
 
-        $results = pg_execute($this->connection->socket, $this->name, $params);
+        $results = pg_execute($this->connection->handle, $this->name, $params);
 
         return new Result($results);
     }

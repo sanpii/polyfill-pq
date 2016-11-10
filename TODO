@@ -10,7 +10,7 @@
 * [x] basic001.phpt
 * [x] basic002.phpt
 * [ ] bound002.phpt
-* [ ] callback001.phpt
+* [x] callback001.phpt
 * [ ] callback002.phpt
 * [ ] callback003.phpt
 * [ ] cancel001.phpt

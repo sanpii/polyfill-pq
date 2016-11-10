@@ -80,6 +80,15 @@ class Connection
         $this->connect();
     }
 
+    public function execAsync($query, $callback = null)
+    {
+        pg_send_query($this->handle, $query);
+
+        while ($results = pg_get_result($this->handle)) {
+            $callback(new Result($results));
+        }
+    }
+
     public function __get($name)
     {
         switch ($name) {

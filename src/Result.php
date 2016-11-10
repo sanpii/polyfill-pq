@@ -52,6 +52,19 @@ class Result implements \Iterator, \Countable
         }
     }
 
+    public function fetchAll()
+    {
+        $results = [];
+
+        foreach (pg_fetch_all($this->results) as $index => $result) {
+            $results[$index] = [];
+            foreach ($result as $row) {
+                $results[$index][] = $row;
+            }
+        }
+        return $results;
+    }
+
     public function __get($name)
     {
         switch($name) {

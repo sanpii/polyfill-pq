@@ -8,8 +8,9 @@ class Statement
     private $name;
     private $query;
     private $types;
+    private $bounds;
 
-    public function __construct(Connection $connection, $name, $query, $types = null, $async = false)
+    public function __construct(Connection $connection, $name, $query, $types = [], $async = false)
     {
         $this->connection = $connection;
         $this->name = $name;
@@ -19,6 +20,13 @@ class Statement
         foreach ($types as $type) {
             $this->types[] = $this->getType($type);
         }
+
+        $this->bounds = [];
+    }
+
+    public function bind($col, &$var)
+    {
+        $this->bounds[$col] = &$var;
     }
 
     public function exec($params = null)
@@ -26,11 +34,18 @@ class Statement
         static $statement = null;
 
         if ($statement === null) {
+            $query = $this->query;
+
             foreach ($this->types as $index => $type) {
                 $index++;
-                $this->query = str_replace("\$$index", "\$$index::$type", $this->query);
+                $query = str_replace("\$$index", "\$$index::$type", $query);
             }
-            pg_prepare($this->connection->handle, $this->name, $this->query);
+
+            $statement = pg_prepare($this->connection->handle, $this->name, $query);
+        }
+
+        if ($params === null) {
+            $params = $this->bounds;
         }
 
         $results = pg_execute($this->connection->handle, $this->name, $params);

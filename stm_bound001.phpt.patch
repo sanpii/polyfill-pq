@@ -1,0 +1,19 @@
+diff --git i/tests/stm_bound001.phpt w/tests/stm_bound001.phpt
+index acf93ac..c8c4ffb 100644
+--- i/tests/stm_bound001.phpt
++++ w/tests/stm_bound001.phpt
+@@ -29,11 +29,11 @@ array(1) {
+   [0]=>
+   array(3) {
+     [0]=>
+-    NULL
++    string(0) ""
+     [1]=>
+-    NULL
++    string(0) ""
+     [2]=>
+-    NULL
++    string(0) ""
+   }
+ }
+ array(1) {

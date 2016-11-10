@@ -23,5 +23,6 @@ install:
     - psql -U postgres -c "CREATE DATABASE test"
     - cp _setup.inc-dist _setup.inc
     - rm tests/info002.phpt
+    - patch -p1 < stm_bound001.phpt.patch
 
 script: ./bin/phpunit tests/

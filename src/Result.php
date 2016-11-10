@@ -82,26 +82,32 @@ class Result implements \Iterator, \Countable
 
         switch($fetchType) {
             case self::FETCH_ARRAY:
-                return pg_fetch_array($this->results, $this->resultsIndex++);
+                $result = pg_fetch_array($this->results, $this->resultsIndex++, PGSQL_NUM);
             break;
             case self::FETCH_ASSOC:
-                return pg_fetch_assoc($this->results, $this->resultsIndex++);
+                $result = pg_fetch_assoc($this->results, $this->resultsIndex++);
             break;
             case self::FETCH_OBJECT:
-                return pg_fetch_object($this->results, $this->resultsIndex++);
+                $result = pg_fetch_object($this->results, $this->resultsIndex++);
             break;
         }
+
+        $col = 0;
+        foreach ($result as &$row) {
+            $type = pg_field_type($this->results, $col++);
+            $row = $this->convert($row, $type);
+        }
+
+        return $result;
     }
 
     public function fetchAll()
     {
+        $index = 0;
         $results = [];
 
-        foreach (pg_fetch_all($this->results) as $index => $result) {
-            $results[$index] = [];
-            foreach ($result as $row) {
-                $results[$index][] = $row;
-            }
+        while ($result = $this->fetchRow(self::FETCH_ARRAY)) {
+            $results[$index++] = $result;
         }
         return $results;
     }

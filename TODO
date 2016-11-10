@@ -41,7 +41,7 @@
 * [ ] res001.phpt
 * [ ] reset001.phpt
 * [ ] savepoint001.phpt
-* [ ] stm_bound001.phpt
+* [x] stm_bound001.phpt
 * [ ] stm_deallocate_prepare001.phpt
 * [ ] stm_desc001.phpt
 * [ ] stm_desc002.phpt

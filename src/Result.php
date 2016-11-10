@@ -14,11 +14,35 @@ class Result implements \Iterator, \Countable
 
     private $results;
     private $resultsIndex;
+    private $bounds;
 
     public function __construct($results)
     {
         $this->results = $results;
         $this->resultsIndex = 0;
+        $this->bounds = [];
+    }
+
+    public function bind($col, &$var)
+    {
+        $this->bounds[$col] = &$var;
+    }
+
+    public function fetchBound()
+    {
+        if (!$this->valid()) {
+            return null;
+        }
+
+        $results = [];
+
+        foreach ($this->bounds as $col => &$var) {
+            $this->fetchCol($var, $col);
+            $results[$col] = $var;
+        }
+
+        $this->resultsIndex++;
+        return $results;
     }
 
     public function fetchCol(&$ref, $col = 0)
@@ -26,28 +50,45 @@ class Result implements \Iterator, \Countable
         $results = pg_fetch_all_columns($this->results, $col);
 
         if ($results !== false) {
-            $ref = $results[0];
+            $type = pg_field_type($this->results, $col);
+            $ref = $this->convert($results[$this->resultsIndex], $type);
             return true;
         } else {
             return NULL;
         }
     }
 
+    private function convert($row, $type)
+    {
+        switch ($type) {
+            case 'int4':
+                return (int)$row;
+            break;
+            default:
+                return $row;
+            break;
+        }
+    }
+
     public function fetchRow($fetchType = null)
     {
+        if (!$this->valid()) {
+            return null;
+        }
+
         if ($fetchType === null) {
             $fetchType = $this->fetchType;
         }
 
         switch($fetchType) {
             case self::FETCH_ARRAY:
-                return pg_fetch_array($this->results, $this->resultsIndex);
+                return pg_fetch_array($this->results, $this->resultsIndex++);
             break;
             case self::FETCH_ASSOC:
-                return pg_fetch_assoc($this->results, $this->resultsIndex);
+                return pg_fetch_assoc($this->results, $this->resultsIndex++);
             break;
             case self::FETCH_OBJECT:
-                return pg_fetch_object($this->results, $this->resultsIndex);
+                return pg_fetch_object($this->results, $this->resultsIndex++);
             break;
         }
     }

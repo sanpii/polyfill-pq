@@ -4,14 +4,8 @@ namespace pq;
 
 class Connection
 {
-    public $handle;
-
-    public $db;
     public $user;
     public $pass;
-    public $host;
-    public $port;
-    public $options;
 
     const OK = 0;
     const BAD = 1;
@@ -30,15 +24,29 @@ class Connection
     const POLLING_WRITING = 2;
     const POLLING_OK = 3;
 
+    public $handle;
+    private $dsn;
+    private $flags;
+
     public function __construct($dsn, $flags = 0)
     {
-        if ($flags & self::PERSISTENT) {
-            $this->handle = pg_pconnect($dsn);
+        $this->dsn = $dsn;
+        $this->flags = $flags;
+
+        $this->connect();
+    }
+
+    private function connect()
+    {
+        if ($this->flags & self::PERSISTENT) {
+            $this->handle = pg_pconnect($this->dsn);
         } else {
-            if ($flags & self::ASYNC) {
+            if ($this->flags & self::ASYNC) {
                 $flags = PGSQL_CONNECT_ASYNC;
+            } else {
+                $flags = 0;
             }
-            $this->handle = pg_connect($dsn, $flags);
+            $this->handle = pg_connect($this->dsn, $flags);
         }
     }
 
@@ -66,9 +74,27 @@ class Connection
         return pg_connect_poll($this->handle);
     }
 
+    public function resetAsync()
+    {
+        pg_close($this->handle);
+        $this->connect();
+    }
+
     public function __get($name)
     {
         switch ($name) {
+            case 'db':
+                return pg_dbname($this->handle);
+            break;
+            case 'host':
+                return pg_host($this->handle);
+            break;
+            case 'port':
+                return pg_port($this->handle);
+            break;
+            case 'options':
+                return pg_options($this->handle);
+            break;
             case 'status':
                 return pg_connection_status($this->handle);
             break;

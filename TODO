@@ -48,6 +48,6 @@
 * [ ] stm_props001.phpt
 * [ ] trans001.phpt
 * [ ] trans002.phpt
-* [ ] types001.phpt
+* [x] types001.phpt
 * [ ] types002.phpt
 * [ ] unbuffered001.phpt

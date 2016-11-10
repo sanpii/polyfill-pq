@@ -4,7 +4,7 @@ namespace pq;
 
 class Types implements \ArrayAccess
 {
-    private $connection;
+    public $connection;
     private $namespaces;
 
     public function __construct(Connection $connection, $namespaces = NULL)
@@ -15,21 +15,17 @@ class Types implements \ArrayAccess
 
     public function offsetExists($offset)
     {
+        $results = $this->getType($offset);
+
+        return ($results->count() > 0);
     }
 
     public function offsetGet($offset)
     {
-        if ($offset === 'connection') {
-            return $this->connection;
-        } else {
-            $results = $this->connection->execParams(
-                "SELECT oid, * FROM pg_type WHERE typname = $1",
-                [$offset]
-            );
+        $results = $this->getType($offset);
 
-            $results->fetchType = Result::FETCH_OBJECT;
-            return $results->current();
-        }
+        $results->fetchType = Result::FETCH_OBJECT;
+        return $results->current();
     }
 
     public function offsetSet($offset, $value)
@@ -40,5 +36,20 @@ class Types implements \ArrayAccess
     public function offsetUnset($offset)
     {
         throw new \LogicException("Read only property");
+    }
+
+    private function getType($offset)
+    {
+        if (is_numeric($offset)) {
+            return $this->connection->execParams(
+                "SELECT oid, * FROM pg_type WHERE oid = $1",
+                [$offset]
+            );
+        } else {
+            return $this->connection->execParams(
+                "SELECT oid, * FROM pg_type WHERE typname = $1",
+                [$offset]
+            );
+        }
     }
 }

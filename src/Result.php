@@ -10,6 +10,8 @@ class Result implements \Iterator, \Countable
     const FETCH_ASSOC = 1;
     const FETCH_OBJECT = 2;
 
+    public $fetchType;
+
     private $results;
     private $resultsIndex;
 
@@ -17,6 +19,18 @@ class Result implements \Iterator, \Countable
     {
         $this->results = $results;
         $this->resultsIndex = 0;
+    }
+
+    public function fetchCol(&$ref, $col = 0)
+    {
+        $results = pg_fetch_all_columns($this->results, $col);
+
+        if ($results !== false) {
+            $ref = $results[0];
+            return true;
+        } else {
+            return NULL;
+        }
     }
 
     public function __get($name)

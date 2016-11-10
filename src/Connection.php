@@ -84,9 +84,14 @@ class Connection
     {
         pg_send_query($this->handle, $query);
 
-        while ($results = pg_get_result($this->handle)) {
-            $callback(new Result($results));
-        }
+        #$callback($this->getResult());
+    }
+
+    public function getResult()
+    {
+        $results = pg_get_result($this->handle);
+
+        return new Result($results);
     }
 
     public function __get($name)
@@ -109,6 +114,9 @@ class Connection
             break;
             case 'socket':
                 return pg_socket($this->handle);
+            break;
+            case 'errorMessage':
+                return pg_last_error($this->handle);
             break;
             default:
                 throw new \Exception("Invalid property pg\\Connection::$name");

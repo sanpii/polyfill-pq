@@ -21,6 +21,7 @@ class Result implements \Iterator, \Countable
         $this->results = $results;
         $this->resultsIndex = 0;
         $this->bounds = [];
+        $this->fetchType = self::FETCH_ARRAY;
     }
 
     public function bind($col, &$var)
@@ -118,17 +119,58 @@ class Result implements \Iterator, \Countable
             case 'status':
                 return pg_result_status($this->results);
             break;
+            case 'errorMessage':
+                return pg_result_error($this->results);
+            break;
+            case 'diag':
+                return [
+                    'severity' => pg_result_error_field($this->results, PGSQL_DIAG_SEVERITY),
+                    'sqlstate' => pg_result_error_field($this->results, PGSQL_DIAG_SQLSTATE),
+                    'message_primary' => pg_result_error_field($this->results, PGSQL_DIAG_MESSAGE_PRIMARY),
+                    'message_detail' => pg_result_error_field($this->results, PGSQL_DIAG_MESSAGE_DETAIL),
+                    'message_hint' => pg_result_error_field($this->results, PGSQL_DIAG_MESSAGE_HINT),
+                    'statement_position' => pg_result_error_field($this->results, PGSQL_DIAG_STATEMENT_POSITION),
+                    'internal_position' => pg_result_error_field($this->results, PGSQL_DIAG_INTERNAL_POSITION),
+                    'internal_query' => pg_result_error_field($this->results, PGSQL_DIAG_INTERNAL_QUERY),
+                    'context' => pg_result_error_field($this->results, PGSQL_DIAG_CONTEXT),
+                    'source_file' => pg_result_error_field($this->results, PGSQL_DIAG_SOURCE_FILE),
+                    'source_line' => pg_result_error_field($this->results, PGSQL_DIAG_SOURCE_LINE),
+                    'source_function' => pg_result_error_field($this->results, PGSQL_DIAG_SOURCE_FUNCTION),
+                ];
+            break;
             case 'numRows':
                 return $this->count();
             break;
             case 'numCols':
-                return pg_num_fields($this->results);
+                if (!is_resource($this->results)) {
+                    return 0;
+                } else {
+                    return pg_num_fields($this->results);
+                }
+            break;
+            default:
+                throw new \Exception("Invalid property pg\\Result::$name");
             break;
         }
     }
 
+    public function __debugInfo()
+    {
+        return [
+            'status' => $this->status,
+            'errorMessage' => $this->errorMessage,
+            'diag' => $this->diag,
+            'numRows' => $this->numRows,
+            'numCols' => $this->numCols,
+        ];
+    }
+
     public function count()
     {
+        if (!is_resource($this->results)) {
+            return 0;
+        }
+
         return pg_num_rows($this->results);
     }
 

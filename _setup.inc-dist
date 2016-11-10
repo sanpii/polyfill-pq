@@ -1,0 +1,4 @@
+<?php
+require_once __DIR__ . '/vendor/autoload.php';
+
+define("PQ_DSN", getenv("PQ_DSN") ?: "host=localhost");
